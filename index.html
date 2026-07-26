@@ -5,331 +5,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PapusVPN Messenger</title>
     <style>
-        :root {
-            --bg-color: #0b141a;
-            --panel-bg: #111b21;
-            --panel-header: #202c33;
-            --text-color: #e9edef;
-            --accent-color: #00a884;
-            --chat-bg: #0b141a;
-            --msg-in: #202c33;
-            --msg-out: #005c4b;
-            --tt-blue: #25f4ee;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #0b141a; color: #e9edef; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .app-header { background: #202c33; padding: 10px; font-weight: bold; text-align: center; color: #20d5ec; }
+        .channel-controls { padding: 10px; background: #111b21; display: flex; gap: 8px; border-bottom: 1px solid #222e35; }
+        .channel-controls input { flex: 1; padding: 8px 12px; border-radius: 20px; border: none; background: #2a3942; color: #fff; outline: none; }
+        .btn { background: #00a884; color: #fff; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .channels-list { display: flex; overflow-x: auto; padding: 10px; background: #111b21; gap: 10px; border-bottom: 1px solid #222e35; }
+        .channel-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #202c33; border-radius: 20px; white-space: nowrap; cursor: pointer; }
+        .channel-item.active { background: #005c4b; border: 1px solid #00a884; }
+        .pv-logo { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #00ff00; background: #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #00ff00; box-shadow: 0 0 6px #00ff00; }
+        .avatar-text { width: 28px; height: 28px; border-radius: 50%; background: #3d5afe; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; color: #fff; }
+        .badge-tiktok { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: #20d5ec; color: #000; border-radius: 50%; font-size: 9px; font-weight: bold; margin-left: 5px; box-shadow: 0 0 4px #20d5ec; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: #0b141a; position: relative; }
+        .chat-header { padding: 10px 15px; background: #202c33; border-bottom: 1px solid #222e35; display: flex; align-items: center; gap: 10px; }
+        
+        /* Кнопка со ссылкой на VPN сайт */
+        .vpn-link-banner { 
+            background: linear-gradient(135deg, #005c4b, #202c33); 
+            padding: 12px; 
+            text-align: center; 
+            border-bottom: 1px solid #222e35; 
+            display: none; 
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            height: 100vh;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .messenger-container {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--panel-bg);
-            overflow: hidden;
-        }
-
-        /* Левая панель */
-        .sidebar {
-            width: 30%;
-            min-width: 300px;
-            background-color: var(--panel-bg);
-            border-right: 1px solid #222e35;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            background-color: var(--panel-header);
-            font-size: 1.3rem;
-            font-weight: bold;
-            border-bottom: 1px solid #222e35;
-            letter-spacing: 0.5px;
-        }
-
-        .channel-controls {
-            padding: 15px;
-            background-color: var(--panel-header);
-            border-bottom: 1px solid #222e35;
-            display: flex;
-            gap: 10px;
-        }
-
-        .channel-controls input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            background: #2a3942;
-            color: #fff;
-            outline: none;
-        }
-
-        .btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
+        .vpn-link-btn { 
+            display: inline-block; 
+            background: #00a884; 
+            color: #fff; 
+            text-decoration: none; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
             transition: background 0.2s;
         }
+        .vpn-link-btn:hover { background: #008f72; }
 
-        .btn:hover {
-            background-color: #008f72;
-        }
-
-        .channels-list {
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .channel-item {
-            padding: 15px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #222e35;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: background 0.2s;
-        }
-
-        .channel-item:hover, .channel-item.active {
-            background-color: #2a3942;
-        }
-
-        /* Стилизация круглых аватарок */
-        .avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-            background-color: #2a3942;
-        }
-
-        .avatar-text {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #3d5afe;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-            color: white;
-        }
-
-        /* Верифицированная галочка TikTok */
-        .badge-tiktok {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            background-color: var(--tt-blue);
-            color: #000;
-            border-radius: 50%;
-            font-size: 10px;
-            font-weight: 900;
-            margin-left: 6px;
-            vertical-align: middle;
-            box-shadow: 0 0 4px var(--tt-blue);
-        }
-
-        .channel-info-wrapper {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .channel-role {
-            font-size: 0.75rem;
-            color: #8696a0;
-            margin-top: 2px;
-        }
-
-        /* Главный экран чата */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--chat-bg);
-            background-image: radial-gradient(#202c33 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        .chat-header {
-            padding: 15px 20px;
-            background-color: var(--panel-header);
-            border-bottom: 1px solid #222e35;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .chat-header h1 {
-            font-size: 1.15rem;
-            font-weight: 600;
-        }
-
-        .messages-container {
-            flex: 1;
-            padding: 20px 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            max-width: 65%;
-            padding: 10px 14px;
-            border-radius: 8px;
-            background-color: var(--msg-in);
-            align-self: flex-start;
-            position: relative;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.2);
-        }
-
-        .message.my-message {
-            background-color: var(--msg-out);
-            align-self: flex-end;
-        }
-
-        .message-author-row {
-            font-size: 0.8rem;
-            color: #8696a0;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: 600;
-        }
-
-        .message-text {
-            word-break: break-word;
-            line-height: 1.4;
-            font-size: 0.95rem;
-        }
-
-        .message-time {
-            font-size: 0.7rem;
-            color: #8696a0;
-            display: block;
-            text-align: right;
-            margin-top: 4px;
-        }
-
-        .input-area {
-            padding: 15px 20px;
-            background-color: var(--panel-header);
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .input-area input {
-            flex: 1;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: none;
-            background: #2a3942;
-            color: #fff;
-            font-size: 0.95rem;
-            outline: none;
-        }
+        .messages-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 85%; padding: 8px 12px; border-radius: 10px; background: #202c33; align-self: flex-start; }
+        .message.my-message { background: #005c4b; align-self: flex-end; }
+        .message-text { word-break: break-word; font-size: 15px; }
+        .message-time { font-size: 10px; color: #8696a0; display: block; text-align: right; margin-top: 4px; }
+        .input-area { padding: 10px; background: #202c33; display: flex; gap: 8px; }
+        .input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; background: #2a3942; color: #fff; outline: none; }
     </style>
 </head>
 <body>
 
-    <div class="messenger-container">
-        <!-- Боковая панель -->
-        <div class="sidebar">
-            <div class="sidebar-header">PapusVPN Messenger</div>
-            
-            <!-- Создание канала -->
-            <div class="channel-controls">
-                <input type="text" id="newChannelInput" placeholder="Название канала...">
-                <button class="btn" onclick="createNewChannel()">+</button>
-            </div>
+    <div class="app-header">PapusVPN Messenger</div>
+    
+    <div class="channel-controls">
+        <input type="text" id="newChannelInput" placeholder="Название канала...">
+        <button class="btn" onclick="createNewChannel()">+</button>
+    </div>
 
-            <!-- Список каналов -->
-            <div class="channels-list" id="channelsList"></div>
+    <div class="channels-list" id="channelsList"></div>
+
+    <div class="chat-area">
+        <div class="chat-header" id="chatHeaderInfo"></div>
+        
+        <!-- Баннер с кнопкой-ссылкой -->
+        <div class="vpn-link-banner" id="vpnLinkBanner">
+            <a href="https://papusgalaktinys.github.io/Newsitevpn/" target="_blank" class="vpn-link-btn">
+                🌐 Открыть PapusVPN Website
+            </a>
         </div>
 
-        <!-- Область чата -->
-        <div class="chat-area">
-            <div class="chat-header">
-                <img id="currentChannelAvatar" class="avatar" src="" alt="" style="display:none;">
-                <div id="currentChannelAvatarText" class="avatar-text" style="display:none;"></div>
-                <h1 id="currentChannelTitle">PapusVPN</h1>
-            </div>
-            
-            <div class="messages-container" id="messagesContainer"></div>
-            
-            <div class="input-area">
-                <input type="text" id="messageInput" placeholder="Напишите сообщение..." onkeypress="handleKeyPress(event)">
-                <button class="btn" onclick="sendMessage()">Отправить</button>
-            </div>
+        <div class="messages-container" id="messagesContainer"></div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Напишите сообщение..." onkeypress="handleKeyPress(event)">
+            <button class="btn" onclick="sendMessage()">></button>
         </div>
     </div>
 
     <script>
-        // Ссылка на ваш логотип PV
-        const logoUrl = 'https://unsplash.com'; 
-        // Примечание: Для корректного отображения картинки на вашем домене github, 
-        // скрипт использует встроенную базовую ссылку. Ниже мы подменим её на картинку из вашего запроса.
-        const defaultLogo = "https://githubusercontent.com";
-
-        // Попытка загрузить данные из локальной памяти браузера
-        let channels = JSON.parse(localStorage.getItem('papus_messenger_channels'));
-
-        // Если памяти нет, создаем структуру по умолчанию
-        if (!channels) {
-            channels = {
-                'papus-vpn': {
-                    name: 'PapusVPN',
-                    isDev: true,
-                    avatar: 'https://ibb.co', // Ссылка-заглушка, заменяемая на изображение из чата
-                    messages: [
-                        { author: 'PapusVPN Messenger', text: 'Добро пожаловать в официальный канал PapusVPN!', isDev: true, time: '12:00' }
-                    ]
-                }
-            };
-        }
-
-        // Переопределяем аватарку разработчика на точную картинку PV
-        channels['papus-vpn'].avatar = "https://postimg.cc" || defaultLogo; 
-        // Резервный рабочий вариант картинки PV (зеленый круг, буквы PV)
-        if(channels['papus-vpn']) {
-            channels['papus-vpn'].avatar = 'https://googleusercontent.com'; 
-            // Интегрируем base64 версию вашего изображения напрямую для стабильности на GitHub
-            channels['papus-vpn'].avatar = 'https://imgur.com'; 
-        }
+        let channels = JSON.parse(localStorage.getItem('papus_v6_data')) || {
+            'papus-vpn': {
+                name: 'PapusVPN (Канал разработчика)',
+                isDev: true,
+                messages: [{ text: 'Добро пожаловать в официальный канал разработчика PapusVPN!', isMy: false, time: '12:00' }]
+            }
+        };
 
         let currentChannelId = 'papus-vpn';
 
-        function saveToStorage() {
-            localStorage.setItem('papus_messenger_channels', JSON.stringify(channels));
+        function save() { localStorage.setItem('papus_v6_data', JSON.stringify(channels)); }
+
+        function init() { renderChannels(); switchChannel('papus-vpn'); }
+
+        function renderChannels() {
+            const list = document.getElementById('channelsList');
+            list.innerHTML = '';
+            Object.keys(channels).forEach(id => {
+                const ch = channels[id];
+                const div = document.createElement('div');
+                div.className = `channel-item ${id === currentChannelId ? 'active' : ''}`;
+                div.onclick = () => switchChannel(id);
+                let badge = ch.isDev ? '<span class="badge-tiktok">✓</span>' : '';
+                let icon = ch.isDev ? `<div class="pv-logo">PV</div>` : `<div class="avatar-text">${ch.name.substring(0,2).toUpperCase()}</div>`;
+                div.innerHTML = `${icon}<span style="font-size:14px; font-weight:500;">${ch.name}${badge}</span>`;
+                list.appendChild(div);
+            });
         }
 
-        function init() {
-            renderChannels();
-            switchChannel('papus-vpn');
+        function switchChannel(id) { 
+            currentChannelId = id; 
+            renderChannels(); 
+            
+            const header = document.getElementById('chatHeaderInfo');
+            const banner = document.getElementById('vpnLinkBanner');
+            const ch = channels[id];
+            
+            let badge = ch.isDev ? '<span class="badge-tiktok">✓</span>' : '';
+            let icon = ch.isDev ? `<div class="pv-logo">PV</div>` : `<div class="avatar-text">${ch.name.substring(0,2).toUpperCase()}</div>`;
+            header.innerHTML = `${icon}<span style="font-size:16px; font-weight:bold;">${ch.name}${badge}</span>`;
+            
+            // Кнопка показывается ТОЛЬКО в канале разработчика PapusVPN
+            if (ch.isDev) {
+                banner.style.display = 'block';
+            } else {
+                banner.style.display = 'none';
+            }
+            
+            renderMessages(); 
         }
+
+        function renderMessages() {
+            const box = document.getElementById('messagesContainer');
+            box.innerHTML = '';
+            channels[currentChannelId].messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `message ${msg.isMy ? 'my-message' : ''}`;
+                div.innerHTML = `
+                    <div class="message-text">${msg.text}</div>
+                    <span class="message-time">${msg.time}</span>
+                `;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function createNewChannel() {
+            const input = document.getElementById('newChannelInput');
+            const name = input.value.trim();
+            if (!name) return;
+            const id = 'ch-' + Date.now();
+            channels[id] = { name: name, isDev: false, messages: [] };
+            input.value = ''; save(); switchChannel(id);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            channels[currentChannelId].messages.push({
+                text: text,
+                isMy: true,
+                time: time
+            });
+            input.value = ''; save(); renderMessages();
+        }
+
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+        init();
+    </script>
+</body>
+</html>
