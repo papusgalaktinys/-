@@ -21,6 +21,7 @@
             overflow: hidden;
         }
 
+        /* Левая панель */
         .sidebar {
             width: 75px;
             background-color: #161b22;
@@ -51,6 +52,7 @@
             border-left: 4px solid #2ea44f;
         }
 
+        /* Фирменная неоновая аватарка PV */
         .avatar-box {
             width: 48px;
             height: 48px;
@@ -72,6 +74,28 @@
             color: #ffffff;
         }
 
+        /* Кнопка-дублер в левой панели */
+        .sidebar-footer {
+            width: 100%;
+            padding-bottom: 10px;
+        }
+
+        .sidebar-vpn-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
+            background-color: #2ea44f;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 18px;
+            margin: 0 auto;
+            box-shadow: 0 0 15px rgba(46, 164, 79, 0.4);
+        }
+
+        /* Область чата */
         .chat-area {
             flex-grow: 1;
             display: flex;
@@ -81,21 +105,15 @@
             height: 100%;
         }
 
+        /* Шапка чата */
         .chat-header {
             padding: 10px 15px;
             background-color: #161b22;
             border-bottom: 1px solid #30363d;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .header-text {
@@ -110,6 +128,7 @@
             align-items: center;
         }
 
+        /* Твоя крутая круглая галочка */
         .verified-badge {
             display: inline-flex;
             align-items: center;
@@ -135,19 +154,7 @@
             margin-top: 1px;
         }
 
-        .vpn-btn {
-            background-color: #2ea44f;
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 12px;
-            padding: 8px 12px;
-            border-radius: 20px;
-            box-shadow: 0 0 10px rgba(46, 164, 79, 0.4);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
+        /* Контейнер сообщений */
         .messages-container {
             flex-grow: 1;
             padding: 15px;
@@ -156,7 +163,6 @@
             flex-direction: column;
             gap: 12px;
             background-color: #0d1117;
-            -webkit-overflow-scrolling: touch;
         }
 
         .message-card {
@@ -226,14 +232,43 @@
             margin-top: 4px;
         }
 
-        .input-container {
-            padding: 12px;
+        /* НИЖНЯЯ ПАНЕЛЬ СФОРМИРОВАНА ПРАВИЛЬНО */
+        .bottom-controls {
             background-color: #161b22;
             border-top: 1px solid #30363d;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+            width: 100%;
+        }
+
+        /* НАДЁЖНАЯ БОЛЬШАЯ ЗЕЛЁНАЯ КНОПКА ПОДПИСКИ ПРЯМО НАД ОКОННЫМ ВВОДОМ */
+        .main-vpn-btn {
+            display: block;
+            width: 100%;
+            background-color: #2ea44f;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(46, 164, 79, 0.4);
+        }
+
+        .main-vpn-btn:hover {
+            background-color: #2c974b;
+        }
+
+        /* Форма ввода текста */
+        .input-form {
             display: flex;
             gap: 8px;
             align-items: center;
-            flex-shrink: 0;
+            width: 100%;
         }
 
         .chat-input {
@@ -251,7 +286,6 @@
             border-color: #2ea44f;
         }
 
-        /* Кнопка с поддержкой тач-событий мобилок */
         .send-btn {
             background-color: #2ea44f;
             color: white;
@@ -265,20 +299,25 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            touch-action: manipulation;
         }
     </style>
 </head>
 <body>
 
+    <!-- Боковая панель -->
     <div class="sidebar">
         <div class="channel-list">
             <div class="channel-item">
                 <div class="avatar-box">P<span>V</span></div>
             </div>
         </div>
+        <div class="sidebar-footer">
+            <!-- Резервный ключ-ссылка -->
+            <a href="https://papusgalaktinys.github.io/Newsitevpn/" target="_blank" class="sidebar-vpn-btn">🔑</a>
+        </div>
     </div>
 
+    <!-- Чат область -->
     <div class="chat-area">
         <div class="chat-header">
             <div class="header-left">
@@ -288,9 +327,9 @@
                     <div class="preview">разработчик</div>
                 </div>
             </div>
-            <a href="https://github.io" target="_blank" class="vpn-btn">🔑 Получить подписку</a>
         </div>
 
+        <!-- Лента новостей -->
         <div class="messages-container" id="messagesBox">
             <div class="message-card">
                 <div class="message-header-info">
@@ -313,26 +352,3 @@
                     🚀 <b>PapusVPN успешно запущен!</b><br><br>
                     Наш бесплатный VPN полностью готов к работе. Подходит для Brawl Stars, YouTube, Telegram и ChatGPT!
                 </div>
-                <a href="https://github.io" target="_blank" class="message-link">Открыть панель подписок PapusVPN ➔</a>
-                <div class="message-time">15:32</div>
-            </div>
-        </div>
-
-        <div class="input-container">
-            <input type="text" class="chat-input" id="messageInput" placeholder="Написать в канал..." autocomplete="off">
-            <button class="send-btn" id="sendBtn" type="button">➔</button>
-        </div>
-    </div>
-
-    <script {nonce}>
-        // Ждем полной загрузки страницы
-        window.addEventListener('DOMContentLoaded', () => {
-            const inputElement = document.getElementById('messageInput');
-            const buttonElement = document.getElementById('sendBtn');
-            const containerElement = document.getElementById('messagesBox');
-
-            function executeSending() {
-                const messageText = inputElement.value.trim();
-                if (messageText === '') return;
-
-                const currentTime = new Date();
