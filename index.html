@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Papus Messenger</title>
     <style>
         * {
@@ -22,136 +22,160 @@
 
         /* Боковое меню */
         .sidebar {
-            width: 30%;
+            width: 80px;
             background-color: #161b22;
             border-right: 1px solid #30363d;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
-            padding: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            border-bottom: 1px solid #30363d;
-            color: #2ea44f;
-            text-shadow: 0 0 10px rgba(46, 164, 79, 0.3);
+            display: none;
         }
 
         .channel-list {
-            overflow-y: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             flex-grow: 1;
         }
 
         .channel-item {
             display: flex;
             align-items: center;
-            padding: 15px 20px;
+            justify-content: center;
+            width: 100%;
+            padding: 12px 0;
             cursor: pointer;
             background-color: #21262d;
             border-left: 4px solid #2ea44f;
         }
 
-        /* Твой аватар */
+        .channel-info {
+            display: none;
+        }
+
+        /* ФИКСИРОВАННЫЙ КРУГЛЫЙ АВАТАР */
         .avatar {
-            width: 45px;
-            height: 45px;
+            width: 48px;
+            height: 48px;
             border: 2px solid #2ea44f;
-            border-radius: 50%;
-            margin-right: 12px;
+            border-radius: 50% !important;
             box-shadow: 0 0 8px rgba(46, 164, 79, 0.4);
             object-fit: cover;
-        }
-
-        .channel-info .name {
-            font-weight: 600;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-        }
-
-        /* СИНЯЯ ГАЛОЧКА ИЗ ПЕРВОГО ВАРИАНТА */
-        .verified-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 14px;
-            height: 14px;
-            background-color: #3897f0;
-            color: #fff;
-            border-radius: 50%;
-            margin-left: 5px;
-            font-size: 9px;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-        .verified-badge::after {
-            content: "✓";
-        }
-
-        .channel-info .preview {
-            font-size: 12px;
-            color: #8b949e;
-            margin-top: 3px;
+            flex-shrink: 0 !important;
         }
 
         .sidebar-footer {
-            padding: 15px;
-            border-top: 1px solid #30363d;
+            width: 100%;
+            padding: 0 10px;
         }
 
         .vpn-btn {
-            display: block;
-            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
             background-color: #2ea44f;
             color: white;
-            text-align: center;
-            padding: 12px;
-            border-radius: 8px;
+            border-radius: 50%;
             text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
+            font-size: 18px;
+            margin: 0 auto;
             box-shadow: 0 0 15px rgba(46, 164, 79, 0.4);
         }
 
         /* Окно чата */
         .chat-area {
-            width: 70%;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             background-color: #0d1117;
+            width: calc(100% - 80px);
         }
 
         .chat-header {
-            padding: 15px 20px;
+            padding: 12px 15px;
             background-color: #161b22;
             border-bottom: 1px solid #30363d;
             display: flex;
             align-items: center;
+            gap: 12px;
         }
 
+        .chat-header .header-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header .name {
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ТА САМАЯ СВЕТЛО-СИНЯЯ ГАЛОКА ИЗ ТИКТОКА / VPN */
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background-color: #46c1f6;
+            border-radius: 50% !important;
+            margin-left: 6px;
+            flex-shrink: 0 !important;
+            position: relative;
+        }
+        
+        .verified-badge::after {
+            content: "";
+            display: block;
+            width: 4px;
+            height: 7px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-top: -2px;
+        }
+
+        .chat-header .preview {
+            font-size: 12px;
+            color: #2ea44f;
+            margin-top: 2px;
+        }
+
+        /* Сетка сообщений */
         .messages-container {
             flex-grow: 1;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            background-color: #0d1117;
         }
 
-        /* Посты и новые сообщения */
+        /* Карточка поста */
         .message-card {
             background-color: #161b22;
             border: 1px solid #30363d;
             border-radius: 12px;
-            padding: 15px;
-            max-width: 85%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            animation: fadeIn 0.3s ease;
+            padding: 12px;
+            width: 100%;
+            max-width: 90%;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            animation: fadeIn 0.2s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -160,6 +184,15 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 8px;
+        }
+
+        .msg-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50% !important;
+            border: 1px solid #2ea44f;
+            object-fit: cover;
+            flex-shrink: 0 !important;
         }
 
         .message-author {
@@ -171,34 +204,35 @@
         }
 
         .message-text {
-            font-size: 15px;
-            line-height: 1.5;
+            font-size: 14px;
+            line-height: 1.4;
             color: #c9d1d9;
             word-break: break-word;
         }
 
         .message-link {
             display: inline-block;
-            margin-top: 10px;
+            margin-top: 8px;
             color: #58a6ff;
             text-decoration: none;
             font-weight: 500;
+            font-size: 13px;
         }
 
         .message-time {
-            font-size: 11px;
+            font-size: 10px;
             color: #8b949e;
             text-align: right;
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         /* Панель ввода */
         .input-container {
-            padding: 15px 20px;
+            padding: 12px;
             background-color: #161b22;
             border-top: 1px solid #30363d;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
 
@@ -207,15 +241,14 @@
             background-color: #21262d;
             border: 1px solid #30363d;
             border-radius: 20px;
-            padding: 12px 20px;
+            padding: 10px 15px;
             color: white;
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
         }
 
         .chat-input:focus {
             border-color: #2ea44f;
-            box-shadow: 0 0 10px rgba(46, 164, 79, 0.2);
         }
 
         .send-btn {
@@ -223,59 +256,51 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 10px rgba(46, 164, 79, 0.3);
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
 
-    <!-- Боковая панель -->
+    <!-- Узкая боковая панель для мобилок -->
     <div class="sidebar">
-        <div class="sidebar-header">Papus Мессенджер</div>
         <div class="channel-list">
             <div class="channel-item">
                 <img src="https://multimodal.google" class="avatar" alt="PV">
-                <div class="channel-info">
-                    <div class="name">PapusVPN <span class="verified-badge"></span></div>
-                    <div class="preview">Официальный канал проекта...</div>
-                </div>
             </div>
         </div>
-        
         <div class="sidebar-footer">
-            <a href="https://github.io" target="_blank" class="vpn-btn">🔑 Получить подписку</a>
+            <a href="https://github.io" target="_blank" class="vpn-btn" title="Получить подписку">🔑</a>
         </div>
     </div>
 
-    <!-- Окно чата -->
+    <!-- Чат область -->
     <div class="chat-area">
         <div class="chat-header">
             <img src="https://multimodal.google" class="avatar" alt="PV">
-            <div class="channel-info">
-                <div class="name" style="font-size: 16px;">PapusVPN <span class="verified-badge"></span></div>
-                <div class="preview" style="color: #2ea44f;">официальный аккаунт разработчика</div>
+            <div class="header-text">
+                <div class="name">PapusVPN <span class="verified-badge"></span></div>
+                <div class="preview">официальный аккаунт разработчика</div>
             </div>
         </div>
 
-        <!-- Сетка сообщений -->
         <div class="messages-container" id="messagesBox">
-            
             <!-- Пост 1 -->
             <div class="message-card">
                 <div class="message-header-info">
-                    <img src="https://multimodal.google" style="width:24px; height:24px; border-radius:50%; border: 1px solid #2ea44f;" alt="PV">
+                    <img src="https://multimodal.google" class="msg-avatar" alt="PV">
                     <div class="message-author">PapusVPN <span class="verified-badge"></span></div>
                 </div>
                 <div class="message-text">
                     Добро пожаловать в официальный мессенджер PapusVPN! 🛡️<br><br>
-                    Здесь вы найдете самую свежую информацию о работе нашего бесплатного и безопасного VPN-сервиса. Наш проект создан для стабильного доступа к вашим любимым играм и сайтам.
+                    Здесь вы найдете самую свежую информацию о работе нашего бесплатного и безопасного VPN-сервиса.
                 </div>
                 <div class="message-time">15:30</div>
             </div>
@@ -283,34 +308,26 @@
             <!-- Пост 2 -->
             <div class="message-card">
                 <div class="message-header-info">
-                    <img src="https://multimodal.google" style="width:24px; height:24px; border-radius:50%; border: 1px solid #2ea44f;" alt="PV">
+                    <img src="https://multimodal.google" class="msg-avatar" alt="PV">
                     <div class="message-author">PapusVPN <span class="verified-badge"></span></div>
                 </div>
                 <div class="message-text">
                     🚀 <b>PapusVPN успешно запущен!</b><br><br>
-                    Наш бесплатный VPN полностью готов к работе. Скорость отличная, лимиты обновлены. Отлично подходит для Brawl Stars, YouTube, Telegram и ChatGPT! Получить свою личную ссылку на подключение можно прямо сейчас на нашем сайте.
+                    Наш бесплатный VPN полностью готов к работе. Подходит для Brawl Stars, YouTube, Telegram и ChatGPT!
                 </div>
                 <a href="https://github.io" target="_blank" class="message-link">Открыть панель подписок PapusVPN ➔</a>
                 <div class="message-time">15:32</div>
             </div>
-
         </div>
 
-        <!-- Поле ввода сообщений -->
+        <!-- Поле ввода -->
         <div class="input-container">
-            <input type="text" class="chat-input" id="messageInput" placeholder="Написать сообщение в канал...">
+            <input type="text" class="chat-input" id="messageInput" placeholder="Написать в канал..." autocomplete="off">
             <button class="send-btn" id="sendBtn">➔</button>
         </div>
     </div>
 
-    <!-- Скрипт полной отправки сообщений -->
     <script>
-        const input = document.getElementById('messageInput');
-        const button = document.getElementById('sendBtn');
-        const container = document.getElementById('messagesBox');
-
-        function sendProcess() {
-            const text = input.value.trim();
-            if (text === '') return;
-
-            const now = new Date();
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('messageInput');
+            const button = document.getElementById('sendBtn');
