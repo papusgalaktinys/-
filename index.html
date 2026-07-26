@@ -2,53 +2,93 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PapusVPN Messenger</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background: #0b141a; color: #e9edef; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .app-header { background: #202c33; padding: 10px; font-weight: bold; text-align: center; color: #20d5ec; }
-        .channel-controls { padding: 10px; background: #111b21; display: flex; gap: 8px; border-bottom: 1px solid #222e35; }
+        
+        html, body { height: 100%; min-height: 100%; overflow: hidden; background: #0b141a; }
+        body { display: flex; flex-direction: column; }
+        
+        .app-header { background: #202c33; padding: 10px; font-weight: bold; text-align: center; color: #20d5ec; flex-shrink: 0; }
+        .channel-controls { padding: 10px; background: #111b21; display: flex; gap: 8px; border-bottom: 1px solid #222e35; flex-shrink: 0; }
         .channel-controls input { flex: 1; padding: 8px 12px; border-radius: 20px; border: none; background: #2a3942; color: #fff; outline: none; }
-        .btn { background: #00a884; color: #fff; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .channels-list { display: flex; overflow-x: auto; padding: 10px; background: #111b21; gap: 10px; border-bottom: 1px solid #222e35; }
-        .channel-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #202c33; border-radius: 20px; white-space: nowrap; cursor: pointer; }
+        .btn { background: #00a884; color: #fff; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+        .btn:active { transform: scale(0.95); }
+        
+        .channels-list { display: flex; overflow-x: auto; padding: 10px; background: #111b21; gap: 10px; border-bottom: 1px solid #222e35; flex-shrink: 0; }
+        .channel-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #202c33; border-radius: 20px; white-space: nowrap; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+        .channel-item:active { transform: scale(0.95); }
         .channel-item.active { background: #005c4b; border: 1px solid #00a884; }
+        
         .pv-logo { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #00ff00; background: #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #00ff00; box-shadow: 0 0 6px #00ff00; }
         .avatar-text { width: 28px; height: 28px; border-radius: 50%; background: #3d5afe; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; color: #fff; }
-        .badge-tiktok { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: #20d5ec; color: #000; border-radius: 50%; font-size: 9px; font-weight: bold; margin-left: 5px; box-shadow: 0 0 4px #20d5ec; }
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: #0b141a; position: relative; }
-        .chat-header { padding: 10px 15px; background: #202c33; border-bottom: 1px solid #222e35; display: flex; align-items: center; gap: 10px; }
         
-        /* Кнопка со ссылкой на VPN сайт */
-        .vpn-link-banner { 
-            background: linear-gradient(135deg, #005c4b, #202c33); 
-            padding: 12px; 
-            text-align: center; 
-            border-bottom: 1px solid #222e35; 
-            display: none; 
-        }
-        .vpn-link-btn { 
-            display: inline-block; 
-            background: #00a884; 
-            color: #fff; 
-            text-decoration: none; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            font-size: 14px; 
+        .badge-verified { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 16px; 
+            height: 16px; 
+            background: #00bcd4; 
+            color: #ffffff; 
+            border-radius: 50%; 
+            font-size: 10px; 
             font-weight: bold; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
-            transition: background 0.2s;
+            margin-left: 6px; 
+            vertical-align: middle;
         }
+        
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: #0b141a; overflow: hidden; }
+        .chat-header { padding: 10px 15px; background: #202c33; border-bottom: 1px solid #222e35; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        
+        .vpn-link-banner { background: linear-gradient(135deg, #005c4b, #202c33); padding: 10px; text-align: center; border-bottom: 1px solid #222e35; display: none; flex-shrink: 0; animation: slideDown 0.3s ease-out; }
+        .vpn-link-btn { display: inline-block; background: #00a884; color: #fff; text-decoration: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: background 0.2s; }
         .vpn-link-btn:hover { background: #008f72; }
 
         .messages-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { max-width: 85%; padding: 8px 12px; border-radius: 10px; background: #202c33; align-self: flex-start; }
-        .message.my-message { background: #005c4b; align-self: flex-end; }
+        
+        /* КРАСИВЫЕ АНИМАЦИИ ДЛЯ СООБЩЕНИЙ */
+        .message { 
+            max-width: 85%; 
+            padding: 8px 12px; 
+            border-radius: 10px; 
+            background: #202c33; 
+            align-self: flex-start;
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards; /* Эффект всплытия с легким отскоком */
+            opacity: 0;
+            transform-origin: bottom left;
+        }
+        .message.my-message { 
+            background: #005c4b; 
+            align-self: flex-end; 
+            transform-origin: bottom right;
+        }
+        
+        /* Плавное проявление всего чата при смене канала */
+        .messages-container.fade-switch .message {
+            animation: fadeInSimple 0.2s ease-out forwards;
+        }
+        
         .message-text { word-break: break-word; font-size: 15px; }
         .message-time { font-size: 10px; color: #8696a0; display: block; text-align: right; margin-top: 4px; }
-        .input-area { padding: 10px; background: #202c33; display: flex; gap: 8px; }
-        .input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; background: #2a3942; color: #fff; outline: none; }
+        
+        .input-area { padding: 10px; background: #202c33; display: flex; gap: 8px; flex-shrink: 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+        .input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; background: #2a3942; color: #fff; outline: none; font-size: 16px; }
+
+        /* Описание анимаций через CSS Keyframes */
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeInSimple {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes slideDown {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -65,14 +105,14 @@
     <div class="chat-area">
         <div class="chat-header" id="chatHeaderInfo"></div>
         
-        <!-- Баннер с кнопкой-ссылкой -->
         <div class="vpn-link-banner" id="vpnLinkBanner">
-            <a href="https://papusgalaktinys.github.io/Newsitevpn/" target="_blank" class="vpn-link-btn">
-                🌐 Открыть PapusVPN Website
+            <a href="https://github.io" target="_blank" class="vpn-link-btn">
+                🌐 Открыть веб-сайт PapusVPN
             </a>
         </div>
 
         <div class="messages-container" id="messagesContainer"></div>
+        
         <div class="input-area">
             <input type="text" id="messageInput" placeholder="Напишите сообщение..." onkeypress="handleKeyPress(event)">
             <button class="btn" onclick="sendMessage()">></button>
@@ -80,17 +120,17 @@
     </div>
 
     <script>
-        let channels = JSON.parse(localStorage.getItem('papus_v6_data')) || {
+        let channels = JSON.parse(localStorage.getItem('papus_v11_data')) || {
             'papus-vpn': {
-                name: 'PapusVPN (Канал разработчика)',
+                name: 'PapusVPN',
                 isDev: true,
-                messages: [{ text: 'Добро пожаловать в официальный канал разработчика PapusVPN!', isMy: false, time: '12:00' }]
+                messages: [{ text: '🛡 Добро пожаловать в PapusVPN 🔑 Канал запущен, вы можете писать сюда сообщения.', isMy: false, time: '12:00' }]
             }
         };
 
         let currentChannelId = 'papus-vpn';
 
-        function save() { localStorage.setItem('papus_v6_data', JSON.stringify(channels)); }
+        function save() { localStorage.setItem('papus_v11_data', JSON.stringify(channels)); }
 
         function init() { renderChannels(); switchChannel('papus-vpn'); }
 
@@ -102,7 +142,7 @@
                 const div = document.createElement('div');
                 div.className = `channel-item ${id === currentChannelId ? 'active' : ''}`;
                 div.onclick = () => switchChannel(id);
-                let badge = ch.isDev ? '<span class="badge-tiktok">✓</span>' : '';
+                let badge = ch.isDev ? '<span class="badge-verified">✓</span>' : '';
                 let icon = ch.isDev ? `<div class="pv-logo">PV</div>` : `<div class="avatar-text">${ch.name.substring(0,2).toUpperCase()}</div>`;
                 div.innerHTML = `${icon}<span style="font-size:14px; font-weight:500;">${ch.name}${badge}</span>`;
                 list.appendChild(div);
@@ -117,18 +157,24 @@
             const banner = document.getElementById('vpnLinkBanner');
             const ch = channels[id];
             
-            let badge = ch.isDev ? '<span class="badge-tiktok">✓</span>' : '';
+            let badge = ch.isDev ? '<span class="badge-verified">✓</span>' : '';
             let icon = ch.isDev ? `<div class="pv-logo">PV</div>` : `<div class="avatar-text">${ch.name.substring(0,2).toUpperCase()}</div>`;
             header.innerHTML = `${icon}<span style="font-size:16px; font-weight:bold;">${ch.name}${badge}</span>`;
             
-            // Кнопка показывается ТОЛЬКО в канале разработчика PapusVPN
             if (ch.isDev) {
                 banner.style.display = 'block';
             } else {
                 banner.style.display = 'none';
             }
             
+            // Включаем режим анимации смены канала
+            const box = document.getElementById('messagesContainer');
+            box.classList.add('fade-switch');
+            
             renderMessages(); 
+            
+            // Отключаем режим смены канала, чтобы новые сообщения использовали другую анимацию
+            setTimeout(() => { box.classList.remove('fade-switch'); }, 200);
         }
 
         function renderMessages() {
@@ -156,21 +202,4 @@
         }
 
         function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-            if (!text) return;
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            channels[currentChannelId].messages.push({
-                text: text,
-                isMy: true,
-                time: time
-            });
-            input.value = ''; save(); renderMessages();
-        }
-
-        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
-        init();
-    </script>
-</body>
-</html>
