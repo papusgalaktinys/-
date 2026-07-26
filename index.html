@@ -52,7 +52,7 @@
             border-left: 4px solid #2ea44f;
         }
 
-        /* Твоя неоновая аватарка */
+        /* Твой аватар */
         .avatar {
             width: 45px;
             height: 45px;
@@ -70,30 +70,23 @@
             align-items: center;
         }
 
-        /* В ТОЧНОСТИ ТАКАЯ ЖЕ КРУГЛАЯ ГАЛОЧКА КАК НА СКРИНШОТЕ */
+        /* СИНЯЯ ГАЛОЧКА ИЗ ПЕРВОГО ВАРИАНТА */
         .verified-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 16px;
-            height: 16px;
-            background-color: #46c1f6; /* Светло-синий цвет как на сайте */
+            width: 14px;
+            height: 14px;
+            background-color: #3897f0;
+            color: #fff;
             border-radius: 50%;
-            margin-left: 6px;
-            position: relative;
+            margin-left: 5px;
+            font-size: 9px;
+            font-weight: bold;
             flex-shrink: 0;
         }
-        
-        /* Рисуем белую птичку внутри галочки */
         .verified-badge::after {
-            content: "";
-            display: block;
-            width: 4px;
-            height: 7px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-            margin-top: -2px;
+            content: "✓";
         }
 
         .channel-info .preview {
@@ -199,7 +192,7 @@
             margin-top: 5px;
         }
 
-        /* Панель ввода сообщений */
+        /* Панель ввода */
         .input-container {
             padding: 15px 20px;
             background-color: #161b22;
@@ -271,7 +264,7 @@
             </div>
         </div>
 
-        <!-- Контейнер с сообщениями -->
+        <!-- Сетка сообщений -->
         <div class="messages-container" id="messagesBox">
             
             <!-- Пост 1 -->
@@ -303,12 +296,21 @@
 
         </div>
 
-        <!-- Рабочее поле ввода -->
+        <!-- Поле ввода сообщений -->
         <div class="input-container">
-            <input type="text" class="chat-input" id="messageInput" placeholder="Написать сообщение в канал..." onkeydown="if(event.key === 'Enter') sendMessage()">
-            <button class="send-btn" onclick="sendMessage()">➔</button>
+            <input type="text" class="chat-input" id="messageInput" placeholder="Написать сообщение в канал...">
+            <button class="send-btn" id="sendBtn">➔</button>
         </div>
     </div>
 
-    <!-- Скрипт отправки сообщений -->
-    <script {nonce}>
+    <!-- Скрипт полной отправки сообщений -->
+    <script>
+        const input = document.getElementById('messageInput');
+        const button = document.getElementById('sendBtn');
+        const container = document.getElementById('messagesBox');
+
+        function sendProcess() {
+            const text = input.value.trim();
+            if (text === '') return;
+
+            const now = new Date();
