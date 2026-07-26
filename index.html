@@ -21,7 +21,6 @@
             overflow: hidden;
         }
 
-        /* Боковое меню */
         .sidebar {
             width: 75px;
             background-color: #161b22;
@@ -52,7 +51,6 @@
             border-left: 4px solid #2ea44f;
         }
 
-        /* Иконка PV */
         .avatar-box {
             width: 48px;
             height: 48px;
@@ -74,7 +72,6 @@
             color: #ffffff;
         }
 
-        /* Область чата */
         .chat-area {
             flex-grow: 1;
             display: flex;
@@ -84,14 +81,13 @@
             height: 100%;
         }
 
-        /* КРАСИВАЯ ШАПКА С КНОПКОЙ */
         .chat-header {
             padding: 10px 15px;
             background-color: #161b22;
             border-bottom: 1px solid #30363d;
             display: flex;
             align-items: center;
-            justify-content: space-between; /* Распределяем имя и кнопку по краям */
+            justify-content: space-between;
             gap: 10px;
             flex-shrink: 0;
         }
@@ -114,7 +110,6 @@
             align-items: center;
         }
 
-        /* Галочка */
         .verified-badge {
             display: inline-flex;
             align-items: center;
@@ -140,7 +135,6 @@
             margin-top: 1px;
         }
 
-        /* БОЛЬШАЯ ЗАМЕТНАЯ КНОПКА ПОДПИСКИ В ШАПКЕ */
         .vpn-btn {
             background-color: #2ea44f;
             color: white;
@@ -154,11 +148,6 @@
             flex-shrink: 0;
         }
 
-        .vpn-btn:hover {
-            background-color: #2c974b;
-        }
-
-        /* Прокрутка сообщений */
         .messages-container {
             flex-grow: 1;
             padding: 15px;
@@ -167,9 +156,9 @@
             flex-direction: column;
             gap: 12px;
             background-color: #0d1117;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Карточки постов */
         .message-card {
             background-color: #161b22;
             border: 1px solid #30363d;
@@ -237,7 +226,6 @@
             margin-top: 4px;
         }
 
-        /* Поле ввода внизу */
         .input-container {
             padding: 12px;
             background-color: #161b22;
@@ -263,6 +251,7 @@
             border-color: #2ea44f;
         }
 
+        /* Кнопка с поддержкой тач-событий мобилок */
         .send-btn {
             background-color: #2ea44f;
             color: white;
@@ -276,12 +265,12 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            touch-action: manipulation;
         }
     </style>
 </head>
 <body>
 
-    <!-- Боковая панель -->
     <div class="sidebar">
         <div class="channel-list">
             <div class="channel-item">
@@ -290,7 +279,6 @@
         </div>
     </div>
 
-    <!-- Область чата -->
     <div class="chat-area">
         <div class="chat-header">
             <div class="header-left">
@@ -300,12 +288,10 @@
                     <div class="preview">разработчик</div>
                 </div>
             </div>
-            <!-- ВОТ ОНА — БОЛЬШАЯ КНОПКА ПОДПИСКИ С ПРЯМОЙ ССЫЛКОЙ -->
-            <a href="https://papusgalaktinys.github.io/Newsitevpn/" target="_blank" class="vpn-btn">🔑 Получить подписку</a>
+            <a href="https://github.io" target="_blank" class="vpn-btn">🔑 Получить подписку</a>
         </div>
 
         <div class="messages-container" id="messagesBox">
-            <!-- Пост 1 -->
             <div class="message-card">
                 <div class="message-header-info">
                     <div class="mini-avatar">P<span>V</span></div>
@@ -318,7 +304,6 @@
                 <div class="message-time">15:30</div>
             </div>
 
-            <!-- Пост 2 -->
             <div class="message-card">
                 <div class="message-header-info">
                     <div class="mini-avatar">P<span>V</span></div>
@@ -328,18 +313,26 @@
                     🚀 <b>PapusVPN успешно запущен!</b><br><br>
                     Наш бесплатный VPN полностью готов к работе. Подходит для Brawl Stars, YouTube, Telegram и ChatGPT!
                 </div>
-                <a href="https://papusgalaktinys.github.io/Newsitevpn/" target="_blank" class="message-link">Открыть панель подписок PapusVPN ➔</a>
+                <a href="https://github.io" target="_blank" class="message-link">Открыть панель подписок PapusVPN ➔</a>
                 <div class="message-time">15:32</div>
             </div>
         </div>
 
-        <!-- Поле ввода сообщений -->
         <div class="input-container">
             <input type="text" class="chat-input" id="messageInput" placeholder="Написать в канал..." autocomplete="off">
-            <button class="send-btn" id="sendBtn">➔</button>
+            <button class="send-btn" id="sendBtn" type="button">➔</button>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const input = document.getElementById('messageInput');
+    <script {nonce}>
+        // Ждем полной загрузки страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            const inputElement = document.getElementById('messageInput');
+            const buttonElement = document.getElementById('sendBtn');
+            const containerElement = document.getElementById('messagesBox');
+
+            function executeSending() {
+                const messageText = inputElement.value.trim();
+                if (messageText === '') return;
+
+                const currentTime = new Date();
