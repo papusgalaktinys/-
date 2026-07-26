@@ -6,36 +6,31 @@
     <title>PapusVPN Messenger</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        
         html, body { height: 100%; min-height: 100%; overflow: hidden; background: #0b141a; }
         body { display: flex; flex-direction: column; }
         
         .app-header { background: #202c33; padding: 10px; font-weight: bold; text-align: center; color: #20d5ec; flex-shrink: 0; }
         .channel-controls { padding: 10px; background: #111b21; display: flex; gap: 8px; border-bottom: 1px solid #222e35; flex-shrink: 0; }
-        .channel-controls input { flex: 1; padding: 8px 12px; border-radius: 20px; border: none; background: #2a3942; color: #fff; outline: none; }
+        .channel-controls input { flex: 1; padding: 8px 12px; border-radius: 20px; border: none; background: #2a3942; color: #fff; outline: none; font-size: 16px; }
         .btn { background: #00a884; color: #fff; border: none; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; }
         
         .channels-list { display: flex; overflow-x: auto; padding: 10px; background: #111b21; gap: 10px; border-bottom: 1px solid #222e35; flex-shrink: 0; min-height: 50px; }
         .channel-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #202c33; border-radius: 20px; white-space: nowrap; cursor: pointer; animation: popIn 0.25s ease-out; }
         .channel-item.active { background: #005c4b; border: 1px solid #00a884; }
         
-        /* Фирменный логотип PV на CSS */
         .pv-logo { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #00ff00; background: #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #00ff00; box-shadow: 0 0 6px #00ff00; }
         .avatar-text { width: 28px; height: 28px; border-radius: 50%; background: #3d5afe; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; color: #fff; }
         
-        /* Голубая галочка верификации */
+        /* Круглая голубая галочка как в личном кабинете */
         .badge-verified { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: #00bcd4; color: #ffffff; border-radius: 50%; font-size: 10px; font-weight: bold; margin-left: 6px; vertical-align: middle; }
         
         .chat-area { flex: 1; display: flex; flex-direction: column; background: #0b141a; overflow: hidden; }
         .chat-header { padding: 10px 15px; background: #202c33; border-bottom: 1px solid #222e35; display: flex; align-items: center; gap: 10px; flex-shrink: 0; min-height: 49px; }
         
-        /* Кнопка-ссылка на VPN сайт */
         .vpn-link-banner { background: linear-gradient(135deg, #005c4b, #202c33); padding: 10px; text-align: center; border-bottom: 1px solid #222e35; display: none; flex-shrink: 0; }
         .vpn-link-btn { display: inline-block; background: #00a884; color: #fff; text-decoration: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         
         .messages-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        
-        /* Анимация плавного вылета сообщений */
         .message { max-width: 85%; padding: 8px 12px; border-radius: 10px; background: #202c33; align-self: flex-start; animation: fadeInUp 0.25s ease-out forwards; }
         .message.my-message { background: #005c4b; align-self: flex-end; }
         .message-text { word-break: break-word; font-size: 15px; }
@@ -77,106 +72,106 @@
     </div>
 
     <script>
-        window.onload = function() {
-            const MEMORY_KEY = 'papus_v12_final_data';
-            
-            // Пытаемся прочитать память смартфона
-            let channels = JSON.parse(localStorage.getItem(MEMORY_KEY));
-
-            // Если памяти нет, создаем главный канал по умолчанию
-            if (!channels || !channels['papus-vpn']) {
-                channels = {
-                    'papus-vpn': {
-                        name: 'PapusVPN',
-                        isDev: true,
-                        messages: [{ text: '🛡 Добро пожаловать в PapusVPN 🔑 Канал запущен, вы можете писать сюда сообщения.', isMy: false, time: '12:00' }]
-                    }
-                };
+        // Чистая база данных, которая создаётся каждый раз сама и не ломается
+        let data = {
+            currentChannelId: 'papus-vpn',
+            channels: {
+                'papus-vpn': {
+                    name: 'PapusVPN',
+                    isDev: true,
+                    messages: [{ text: '🛡 Добро пожаловать в PapusVPN 🔑 Канал запущен, вы можете писать сюда сообщения.', isMy: false, time: '12:00' }]
+                }
             }
+        };
 
-            let currentChannelId = 'papus-vpn';
+        const channelsList = document.getElementById('channelsList');
+        const chatHeaderInfo = document.getElementById('chatHeaderInfo');
+        const vpnLinkBanner = document.getElementById('vpnLinkBanner');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const newChannelInput = document.getElementById('newChannelInput');
+        const createBtn = document.getElementById('createBtn');
+        const sendBtn = document.getElementById('sendBtn');
 
-            const channelsList = document.getElementById('channelsList');
-            const chatHeaderInfo = document.getElementById('chatHeaderInfo');
-            const vpnLinkBanner = document.getElementById('vpnLinkBanner');
-            const messagesContainer = document.getElementById('messagesContainer');
-            const messageInput = document.getElementById('messageInput');
-            const newChannelInput = document.getElementById('newChannelInput');
-            const createBtn = document.getElementById('createBtn');
-            const sendBtn = document.getElementById('sendBtn');
-
-            function save() { 
-                localStorage.setItem(MEMORY_KEY, JSON.stringify(channels)); 
-            }
-
-            function renderChannels() {
-                channelsList.innerHTML = '';
-                Object.keys(channels).forEach(id => {
-                    const ch = channels[id];
-                    const div = document.createElement('div');
-                    div.className = `channel-item ${id === currentChannelId ? 'active' : ''}`;
-                    div.onclick = () => switchChannel(id);
-                    
-                    let badge = ch.isDev ? '<span class="badge-verified">✓</span>' : '';
-                    let icon = ch.isDev ? `<div class="pv-logo">PV</div>` : `<div class="avatar-text">${ch.name.substring(0,2).toUpperCase()}</div>`;
-                    
-                    div.innerHTML = `${icon}<span style="font-size:14px; font-weight:500;">${ch.name}${badge}</span>`;
-                    channelsList.appendChild(div);
-                });
-            }
-
-            function switchChannel(id) { 
-                if (!channels[id]) id = 'papus-vpn';
-                currentChannelId = id; 
-                renderChannels(); 
+        function renderChannels() {
+            channelsList.innerHTML = '';
+            Object.keys(data.channels).forEach(id => {
+                const ch = data.channels[id];
+                const div = document.createElement('div');
+                div.className = `channel-item ${id === data.currentChannelId ? 'active' : ''}`;
+                div.onclick = () => switchChannel(id);
                 
-                const ch = channels[id];
                 let badge = ch.isDev ? '<span class="badge-verified">✓</span>' : '';
                 let icon = ch.isDev ? `<div class="pv-logo">PV</div>` : `<div class="avatar-text">${ch.name.substring(0,2).toUpperCase()}</div>`;
                 
-                chatHeaderInfo.innerHTML = `${icon}<span style="font-size:16px; font-weight:bold;">${ch.name}${badge}</span>`;
-                
-                if (ch.isDev) {
-                    vpnLinkBanner.style.display = 'block';
-                } else {
-                    vpnLinkBanner.style.display = 'none';
-                }
-                
-                renderMessages(); 
-            }
+                div.innerHTML = `${icon}<span style="font-size:14px; font-weight:500;">${ch.name}${badge}</span>`;
+                channelsList.appendChild(div);
+            });
+        }
 
-            function renderMessages() {
-                messagesContainer.innerHTML = '';
-                channels[currentChannelId].messages.forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = `message ${msg.isMy ? 'my-message' : ''}`;
-                    div.innerHTML = `
-                        <div class="message-text">${msg.text}</div>
-                        <span class="message-time">${msg.time}</span>
-                    `;
-                    messagesContainer.appendChild(div);
-                });
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        function switchChannel(id) { 
+            data.currentChannelId = id; 
+            renderChannels(); 
+            
+            const ch = data.channels[id];
+            let badge = ch.isDev ? '<span class="badge-verified">✓</span>' : '';
+            let icon = ch.isDev ? `<div class="pv-logo">PV</div>` : `<div class="avatar-text">${ch.name.substring(0,2).toUpperCase()}</div>`;
+            
+            chatHeaderInfo.innerHTML = `${icon}<span style="font-size:16px; font-weight:bold;">${ch.name}${badge}</span>`;
+            
+            if (ch.isDev) {
+                vpnLinkBanner.style.display = 'block';
+            } else {
+                vpnLinkBanner.style.display = 'none';
             }
+            
+            renderMessages(); 
+        }
 
-            window.createNewChannel = function() {
-                const name = newChannelInput.value.trim();
-                if (!name) return;
-                const id = 'ch-' + Date.now();
-                channels[id] = { name: name, isDev: false, messages: [] };
-                newChannelInput.value = ''; 
-                save();
-                switchChannel(id);
-            }
+        function renderMessages() {
+            messagesContainer.innerHTML = '';
+            data.channels[data.currentChannelId].messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `message ${msg.isMy ? 'my-message' : ''}`;
+                div.innerHTML = `
+                    <div class="message-text">${msg.text}</div>
+                    <span class="message-time">${msg.time}</span>
+                `;
+                messagesContainer.appendChild(div);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
 
-            window.sendMessage = function() {
-                const text = messageInput.value.trim();
-                if (!text) return;
-                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                channels[currentChannelId].messages.push({
-                    text: text,
-                    isMy: true,
-                    time: time
-                });
-                
+        function createNewChannel() {
+            const name = newChannelInput.value.trim();
+            if (!name) return;
+            const id = 'ch-' + Date.now();
+            data.channels[id] = { name: name, isDev: false, messages: [] };
+            newChannelInput.value = ''; 
+            switchChannel(id);
+        }
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            data.channels[data.currentChannelId].messages.push({
+                text: text,
+                isMy: true,
+                time: time
+            });
+            messageInput.value = ''; 
+            renderMessages();
+        }
+
+        createBtn.onclick = createNewChannel;
+        sendBtn.onclick = sendMessage;
+
+        messageInput.onkeypress = function(e) { if (e.key === 'Enter') sendMessage(); };
+        newChannelInput.onkeypress = function(e) { if (e.key === 'Enter') createNewChannel(); };
+
+        switchChannel('papus-vpn');
+    </script>
+</body>
+</html>
